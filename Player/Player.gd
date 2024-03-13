@@ -38,3 +38,9 @@ func _physics_process(delta):
 			anime.play("Idle")
 		
 	move_and_slide()
+	
+	if (Global.Health <= 0) or (Global.enemy_nums < 0):
+		#queue_free()
+		Utils.SaveGame()
+		var world = get_parent().get_parent()
+		world.Out_World()

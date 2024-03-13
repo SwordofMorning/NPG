@@ -1,0 +1,53 @@
+[gd_scene load_steps=11 format=3 uid="uid://bgshc1ae5xyap"]
+
+[ext_resource type="Texture2D" uid="uid://svqoprfr46yr" path="res://Resource/Sunny-land-files/Graphical Assets/sprites/cherry/cherry-1.png" id="1_8xfud"]
+[ext_resource type="Script" path="res://Enemy/cherry.gd" id="1_meyy5"]
+[ext_resource type="Texture2D" uid="uid://c8we3ob1s06tt" path="res://Resource/Sunny-land-files/Graphical Assets/sprites/cherry/cherry-2.png" id="2_4twba"]
+[ext_resource type="Texture2D" uid="uid://c5ff1e4v3dj5b" path="res://Resource/Sunny-land-files/Graphical Assets/sprites/cherry/cherry-3.png" id="3_5o8m3"]
+[ext_resource type="Texture2D" uid="uid://0oeen2tcb5u" path="res://Resource/Sunny-land-files/Graphical Assets/sprites/cherry/cherry-4.png" id="4_8e6y0"]
+[ext_resource type="Texture2D" uid="uid://62cejtmrpjcv" path="res://Resource/Sunny-land-files/Graphical Assets/sprites/cherry/cherry-5.png" id="5_pbnsn"]
+[ext_resource type="Texture2D" uid="uid://c1a3r105m541" path="res://Resource/Sunny-land-files/Graphical Assets/sprites/cherry/cherry-6.png" id="6_0ypqs"]
+[ext_resource type="Texture2D" uid="uid://dj0hyqridkc22" path="res://Resource/Sunny-land-files/Graphical Assets/sprites/cherry/cherry-7.png" id="7_nfoue"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_kv0jv"]
+radius = 8.0
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_vesx2"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("1_8xfud")
+}, {
+"duration": 1.0,
+"texture": ExtResource("2_4twba")
+}, {
+"duration": 1.0,
+"texture": ExtResource("3_5o8m3")
+}, {
+"duration": 1.0,
+"texture": ExtResource("4_8e6y0")
+}, {
+"duration": 1.0,
+"texture": ExtResource("5_pbnsn")
+}, {
+"duration": 1.0,
+"texture": ExtResource("6_0ypqs")
+}, {
+"duration": 1.0,
+"texture": ExtResource("7_nfoue")
+}],
+"loop": true,
+"name": &"default",
+"speed": 5.0
+}]
+
+[node name="Cherry" type="Area2D"]
+script = ExtResource("1_meyy5")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("CircleShape2D_kv0jv")
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
+sprite_frames = SubResource("SpriteFrames_vesx2")
+
+[connection signal="body_entered" from="." to="." method="_on_body_entered"]

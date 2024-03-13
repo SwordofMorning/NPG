@@ -1,0 +1,131 @@
+[gd_scene load_steps=20 format=3 uid="uid://g7urgjl4xmuv"]
+
+[ext_resource type="Script" path="res://Enemy/Frog.gd" id="1_4hrte"]
+[ext_resource type="Texture2D" uid="uid://def78cd3wroph" path="res://Resource/Sunny-land-files/Graphical Assets/sprites/enemy-death/enemy-death-1.png" id="1_d0mu6"]
+[ext_resource type="Texture2D" uid="uid://dv1idslts7rmn" path="res://Resource/Sunny-land-files/Graphical Assets/sprites/enemy-death/enemy-death-2.png" id="2_arybp"]
+[ext_resource type="Texture2D" uid="uid://brtdruupntwe7" path="res://Resource/Sunny-land-files/Graphical Assets/sprites/enemy-death/enemy-death-3.png" id="3_70sa4"]
+[ext_resource type="Texture2D" uid="uid://bn1ud7j4yaded" path="res://Resource/Sunny-land-files/Graphical Assets/sprites/enemy-death/enemy-death-4.png" id="4_d2lgy"]
+[ext_resource type="Texture2D" uid="uid://coi76bfx7qepl" path="res://Resource/Sunny-land-files/Graphical Assets/sprites/enemy-death/enemy-death-5.png" id="5_l3f7d"]
+[ext_resource type="Texture2D" uid="uid://bo3db5bc52g3s" path="res://Resource/Sunny-land-files/Graphical Assets/sprites/enemy-death/enemy-death-6.png" id="6_kpsmf"]
+[ext_resource type="Texture2D" uid="uid://01ba3dl2nu67" path="res://Resource/Sunny-land-files/Graphical Assets/sprites/frog/idle/frog-idle-1.png" id="7_wr15b"]
+[ext_resource type="Texture2D" uid="uid://rnr7ohahuebn" path="res://Resource/Sunny-land-files/Graphical Assets/sprites/frog/idle/frog-idle-2.png" id="8_kyrst"]
+[ext_resource type="Texture2D" uid="uid://c4hi14a74qhdd" path="res://Resource/Sunny-land-files/Graphical Assets/sprites/frog/idle/frog-idle-3.png" id="9_m70o4"]
+[ext_resource type="Texture2D" uid="uid://c7jx0q7dojfcg" path="res://Resource/Sunny-land-files/Graphical Assets/sprites/frog/idle/frog-idle-4.png" id="10_igfvv"]
+[ext_resource type="Texture2D" uid="uid://dwhhbc4no6gm3" path="res://Resource/Sunny-land-files/Graphical Assets/sprites/frog/jump/frog-jump-1.png" id="11_8arsq"]
+[ext_resource type="Texture2D" uid="uid://cg5qh7pc1inqv" path="res://Resource/Sunny-land-files/Graphical Assets/sprites/frog/jump/frog-jump-2.png" id="12_5w6e4"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_n3tfr"]
+size = Vector2(18, 15)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_35umm"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("1_d0mu6")
+}, {
+"duration": 1.0,
+"texture": ExtResource("2_arybp")
+}, {
+"duration": 1.0,
+"texture": ExtResource("3_70sa4")
+}, {
+"duration": 1.0,
+"texture": ExtResource("4_d2lgy")
+}, {
+"duration": 1.0,
+"texture": ExtResource("5_l3f7d")
+}, {
+"duration": 1.0,
+"texture": ExtResource("6_kpsmf")
+}],
+"loop": false,
+"name": &"Death",
+"speed": 10.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("7_wr15b")
+}, {
+"duration": 1.0,
+"texture": ExtResource("8_kyrst")
+}, {
+"duration": 1.0,
+"texture": ExtResource("9_m70o4")
+}, {
+"duration": 1.0,
+"texture": ExtResource("10_igfvv")
+}],
+"loop": true,
+"name": &"Idle",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("11_8arsq")
+}, {
+"duration": 1.0,
+"texture": ExtResource("12_5w6e4")
+}],
+"loop": true,
+"name": &"Jump",
+"speed": 5.0
+}]
+
+[sub_resource type="GDScript" id="GDScript_wyq2w"]
+script/source = "extends Area2D
+
+
+# Called when the node enters the scene tree for the first time.
+func _ready():
+	pass # Replace with function body.
+
+
+# Called every frame. 'delta' is the elapsed time since the previous frame.
+func _process(delta):
+	pass
+"
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_snj4m"]
+radius = 161.0
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_plm4e"]
+size = Vector2(20, 3)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_5h3t2"]
+size = Vector2(22, 15)
+
+[node name="Frog" type="CharacterBody2D"]
+script = ExtResource("1_4hrte")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+position = Vector2(0, 3.5)
+shape = SubResource("RectangleShape2D_n3tfr")
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
+position = Vector2(1, 0)
+scale = Vector2(1.01429, 1)
+sprite_frames = SubResource("SpriteFrames_35umm")
+animation = &"Idle"
+
+[node name="PlayerDetection" type="Area2D" parent="."]
+script = SubResource("GDScript_wyq2w")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="PlayerDetection"]
+shape = SubResource("CircleShape2D_snj4m")
+
+[node name="KillEnemy" type="Area2D" parent="."]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="KillEnemy"]
+position = Vector2(0, -6)
+shape = SubResource("RectangleShape2D_plm4e")
+
+[node name="KillPlayer" type="Area2D" parent="."]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="KillPlayer"]
+position = Vector2(0, 3.5)
+shape = SubResource("RectangleShape2D_5h3t2")
+
+[connection signal="body_entered" from="PlayerDetection" to="." method="_on_player_detection_body_entered"]
+[connection signal="body_exited" from="PlayerDetection" to="." method="_on_player_detection_body_exited"]
+[connection signal="body_entered" from="KillEnemy" to="." method="_on_kill_enemy_body_entered"]
+[connection signal="body_entered" from="KillPlayer" to="." method="_on_kill_player_body_entered"]
