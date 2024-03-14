@@ -2,13 +2,6 @@ extends CharacterBody2D
 
 const SPEED = 200.0
 const JUMP_VELOCITY = -400.0
-# How many times ghosts are generated during dash
-const DASH_TIMES = 10
-# iterator for DASH_TIMES
-var dash_remain_times = DASH_TIMES
-const DASH_SPEED_MULTIPLE = 5
-const DASH_SPEED_DEFAULT = 1
-var speed_multiple = DASH_SPEED_DEFAULT
 
 # -1 is left, 1 is right
 var player_direction = 0
@@ -22,6 +15,16 @@ var Ghost = preload("res://Player/Ghost.tscn")
 
 func _ready():
 	pass
+	
+############################################################ Dash ############################################################
+
+# How many times ghosts are generated during dash
+const DASH_TIMES = 10
+# iterator for DASH_TIMES
+var dash_remain_times = DASH_TIMES
+const DASH_SPEED_MULTIPLE = 5
+const DASH_SPEED_DEFAULT = 1
+var speed_multiple = DASH_SPEED_DEFAULT
 	
 func _on_dash_timer_timeout():
 	if dash_remain_times > 0:
@@ -43,32 +46,82 @@ func Player_Death_or_Out_Game():
 		var world = get_parent().get_parent()
 		world.Out_World()
 
+############################################################ Anime State Machine ############################################################
+
+enum Anime_State {
+	Jump,
+	Run,
+	Idle,
+}
+var anime_state = Anime_State.Idle
+
+enum Anime_State_Convert {
+	Run_Pressed,
+	Run_Released,
+	Jump,
+	On_Floor
+}
+var anime_state_convert = Anime_State_Convert.Run_Released
+
+func State_Machine(state, convert):
+	if state == Anime_State.Idle:
+		if convert == Anime_State_Convert.Run_Pressed:
+			return Anime_State.Run
+		elif convert == Anime_State_Convert.Jump:
+			return Anime_State.Jump
+	elif state == Anime_State.Run:
+		if convert == Anime_State_Convert.Run_Released:
+			return Anime_State.Idle
+		elif convert == Anime_State_Convert.Jump:
+			return Anime_State.Jump
+	elif state == Anime_State.Jump:
+		if is_on_floor():
+			anime_state_convert = Anime_State_Convert.On_Floor
+			return Anime_State.Idle
+	return state
+
+############################################################ Process ############################################################
+
 func _physics_process(delta):
-# Grvaity
+## Grvaity
 	if not is_on_floor(): velocity.y += gravity * delta
-# Jump
-	if Input.is_action_pressed("Move_Jump") and is_on_floor():
-		velocity.y = JUMP_VELOCITY
-		anime.play("Jump")
-# Left and Right Move		
+## Left and Right Move
 	if Input.is_action_pressed("Move_Left"):
 		player_direction = -1
-		anime.play("Run")
 		get_node("AnimatedSprite2D").flip_h = true
+		#anime_state = Anime_State.Run
+		anime_state_convert = Anime_State_Convert.Run_Pressed
 	elif Input.is_action_pressed("Move_Right"):
 		player_direction = 1
-		anime.play("Run")
 		get_node("AnimatedSprite2D").flip_h = false
+		#anime_state = Anime_State.Run
+		anime_state_convert = Anime_State_Convert.Run_Pressed
 	elif Input.is_action_just_released("Move_Left") or Input.is_action_just_released("Move_Right"):
 		player_direction = 0
-		anime.play("Idle")
-# Dash
+		#anime_state = Anime_State.Idle
+		anime_state_convert = Anime_State_Convert.Run_Released
+## Jump
+	if Input.is_action_pressed("Move_Jump") and is_on_floor():
+		velocity.y = JUMP_VELOCITY
+		#anime_state = Anime_State.Jump
+		anime_state_convert = Anime_State_Convert.Jump
+## Dash
 	if Input.is_action_pressed("Move_Dash"):
 		get_node("DashTimer").start()
 		gravity = 0
+		velocity.y = 0
 		speed_multiple = DASH_SPEED_MULTIPLE
-
 	velocity.x = player_direction * SPEED * speed_multiple
-	
+
+	anime_state = State_Machine(anime_state, anime_state_convert)
+
+## Animation Play
+	if anime_state == Anime_State.Jump:
+		anime.play("Jump")
+	elif anime_state == Anime_State.Run:
+		anime.play("Run")
+	elif anime_state == Anime_State.Idle:
+		anime.play("Idle")
+		
 	move_and_slide()
 	Player_Death_or_Out_Game()
