@@ -1,8 +1,11 @@
-[gd_scene load_steps=24 format=3 uid="uid://gr1nobse84bf"]
+[gd_scene load_steps=29 format=3 uid="uid://gr1nobse84bf"]
 
 [ext_resource type="Script" path="res://Player/Player.gd" id="1_bakav"]
 [ext_resource type="Texture2D" uid="uid://b86gblgxw8cx3" path="res://Resource/Sunny-land-files/Graphical Assets/sprites/player/hurt/player-hurt-1.png" id="2_6nlbw"]
+[ext_resource type="Texture2D" uid="uid://bty7kmtdhck4h" path="res://Resource/Sunny-land-files/Graphical Assets/sprites/player/climb/player-climb-1.png" id="2_wdy2a"]
 [ext_resource type="Texture2D" uid="uid://8jgodqxrr5j" path="res://Resource/Sunny-land-files/Graphical Assets/sprites/player/hurt/player-hurt-2.png" id="3_hqiej"]
+[ext_resource type="Texture2D" uid="uid://dhg5uqmtoo838" path="res://Resource/Sunny-land-files/Graphical Assets/sprites/player/climb/player-climb-2.png" id="3_k5ydq"]
+[ext_resource type="Texture2D" uid="uid://cisudsk66rqh8" path="res://Resource/Sunny-land-files/Graphical Assets/sprites/player/climb/player-climb-3.png" id="4_7o0sg"]
 [ext_resource type="Texture2D" uid="uid://rct30lh31re" path="res://Resource/Sunny-land-files/Graphical Assets/sprites/player/idle/player-idle-1.png" id="4_tyuui"]
 [ext_resource type="Texture2D" uid="uid://itbx0jlfkqdf" path="res://Resource/Sunny-land-files/Graphical Assets/sprites/player/idle/player-idle-2.png" id="5_8pq57"]
 [ext_resource type="Texture2D" uid="uid://cjb7kkshy60sd" path="res://Resource/Sunny-land-files/Graphical Assets/sprites/player/idle/player-idle-3.png" id="6_72mky"]
@@ -23,6 +26,20 @@ height = 20.0
 animations = [{
 "frames": [{
 "duration": 1.0,
+"texture": ExtResource("2_wdy2a")
+}, {
+"duration": 1.0,
+"texture": ExtResource("3_k5ydq")
+}, {
+"duration": 1.0,
+"texture": ExtResource("4_7o0sg")
+}],
+"loop": true,
+"name": &"Climb",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
 "texture": ExtResource("2_6nlbw")
 }, {
 "duration": 1.0,
@@ -30,6 +47,14 @@ animations = [{
 }],
 "loop": true,
 "name": &"Death",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("9_0w05m")
+}],
+"loop": true,
+"name": &"Fall",
 "speed": 5.0
 }, {
 "frames": [{
@@ -209,10 +234,10 @@ tracks/0/path = NodePath("AnimatedSprite2D:animation")
 tracks/0/interp = 1
 tracks/0/loop_wrap = true
 tracks/0/keys = {
-"times": PackedFloat32Array(0),
-"transitions": PackedFloat32Array(1),
+"times": PackedFloat32Array(0, 0.547124),
+"transitions": PackedFloat32Array(1, 1),
 "update": 1,
-"values": [&"Run"]
+"values": [&"Run", &"Climb"]
 }
 tracks/1/type = "value"
 tracks/1/imported = false
@@ -227,9 +252,68 @@ tracks/1/keys = {
 "values": [0, 1, 2, 3, 4, 5]
 }
 
+[sub_resource type="Animation" id="Animation_e57rr"]
+resource_name = "Climb"
+length = 0.3
+loop_mode = 1
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("AnimatedSprite2D:animation")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [&"Climb"]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("AnimatedSprite2D:frame")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0, 0.1, 0.2),
+"transitions": PackedFloat32Array(1, 1, 1),
+"update": 1,
+"values": [0, 1, 2]
+}
+
+[sub_resource type="Animation" id="Animation_xxidk"]
+resource_name = "Fall"
+length = 0.1
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("AnimatedSprite2D:animation")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [&"Fall"]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("AnimatedSprite2D:frame")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [0]
+}
+
 [sub_resource type="AnimationLibrary" id="AnimationLibrary_dbivy"]
 _data = {
+"Climb": SubResource("Animation_e57rr"),
 "Death": SubResource("Animation_5d4yc"),
+"Fall": SubResource("Animation_xxidk"),
 "Idle": SubResource("Animation_83oc4"),
 "Jump": SubResource("Animation_t52nm"),
 "RESET": SubResource("Animation_8t6kk"),

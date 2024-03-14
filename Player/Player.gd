@@ -52,6 +52,8 @@ enum Anime_State {
 	Jump,
 	Run,
 	Idle,
+	Wall_Slide,
+	Fall,
 }
 var anime_state = Anime_State.Idle
 
@@ -75,9 +77,28 @@ func State_Machine(state, convert):
 		elif convert == Anime_State_Convert.Jump:
 			return Anime_State.Jump
 	elif state == Anime_State.Jump:
+		if velocity.y > 0:
+			return Anime_State.Fall
+	elif state == Anime_State.Fall:
 		if is_on_floor():
 			anime_state_convert = Anime_State_Convert.On_Floor
 			return Anime_State.Idle
+		elif is_on_wall():
+			# v.x needs to be in the opposite vector to wall's normal
+			if (velocity.x > 0 and get_wall_normal().x < 0) or (velocity.x < 0 and get_wall_normal().x > 0):
+				return Anime_State.Wall_Slide
+			else:
+				return Anime_State.Fall
+	elif state == Anime_State.Wall_Slide:
+		if is_on_floor():
+			return Anime_State.Idle
+		elif convert == Anime_State_Convert.Jump:
+			return Anime_State.Jump
+		elif is_on_wall():
+			if (velocity.x > 0 and get_wall_normal().x < 0) or (velocity.x < 0 and get_wall_normal().x > 0):
+				return Anime_State.Wall_Slide
+			else:
+				return Anime_State.Fall
 	return state
 
 ############################################################ Process ############################################################
@@ -89,19 +110,16 @@ func _physics_process(delta):
 	if Input.is_action_pressed("Move_Left"):
 		player_direction = -1
 		get_node("AnimatedSprite2D").flip_h = true
-		#anime_state = Anime_State.Run
 		anime_state_convert = Anime_State_Convert.Run_Pressed
 	elif Input.is_action_pressed("Move_Right"):
 		player_direction = 1
 		get_node("AnimatedSprite2D").flip_h = false
-		#anime_state = Anime_State.Run
 		anime_state_convert = Anime_State_Convert.Run_Pressed
 	elif Input.is_action_just_released("Move_Left") or Input.is_action_just_released("Move_Right"):
 		player_direction = 0
-		#anime_state = Anime_State.Idle
 		anime_state_convert = Anime_State_Convert.Run_Released
 ## Jump
-	if Input.is_action_pressed("Move_Jump") and is_on_floor():
+	if Input.is_action_pressed("Move_Jump") and (is_on_floor() or anime_state == Anime_State.Wall_Slide):
 		velocity.y = JUMP_VELOCITY
 		#anime_state = Anime_State.Jump
 		anime_state_convert = Anime_State_Convert.Jump
@@ -122,6 +140,11 @@ func _physics_process(delta):
 		anime.play("Run")
 	elif anime_state == Anime_State.Idle:
 		anime.play("Idle")
-		
+	elif anime_state == Anime_State.Wall_Slide:
+		anime.play("Climb")
+		velocity.y /= 2
+	elif anime_state == Anime_State.Fall:
+		anime.play("Fall")
+	
 	move_and_slide()
 	Player_Death_or_Out_Game()
