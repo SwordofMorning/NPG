@@ -10,7 +10,6 @@ var World = preload("res://World.tscn")
 func _on_play_button_pressed():
 	Global.Health = 10
 	Global.enemy_nums = 4
-	print(Global.Health)
 	get_tree().change_scene_to_file("res://World.tscn")
 
 func _ready():

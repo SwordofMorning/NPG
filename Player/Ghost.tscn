@@ -1,0 +1,16 @@
+[gd_scene load_steps=3 format=3 uid="uid://vkl2lr0qj5gi"]
+
+[ext_resource type="Texture2D" uid="uid://beuyedw4j3e2p" path="res://Resource/Sunny-land-files/Graphical Assets/sprites/player/jump/player-jump-1.png" id="1_27w2o"]
+[ext_resource type="Script" path="res://Player/Ghost.gd" id="1_kxhvj"]
+
+[node name="Ghost" type="Node2D"]
+script = ExtResource("1_kxhvj")
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+texture = ExtResource("1_27w2o")
+
+[node name="Timer" type="Timer" parent="."]
+wait_time = 0.1
+autostart = true
+
+[connection signal="timeout" from="Timer" to="." method="_on_timer_timeout"]
