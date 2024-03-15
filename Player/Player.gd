@@ -13,9 +13,6 @@ var gravity = ProjectSettings.get_setting("physics/2d/default_gravity")
 var Ghost = preload("res://Player/Ghost.tscn")
 
 @onready var anime = get_node("AnimationPlayer")
-
-func _ready():
-	pass
 	
 ############################################################ Dash ############################################################
 
@@ -26,6 +23,9 @@ var dash_remain_times = DASH_TIMES
 const DASH_SPEED_MULTIPLE = 5
 const DASH_SPEED_DEFAULT = 1
 var speed_multiple = DASH_SPEED_DEFAULT
+var is_dash_in_cool_down = false
+const DASH_COOL_DOWN_PERCENTAGE = 100
+var dash_cool_down_percentage = 100
 	
 func _on_dash_timer_timeout():
 	if dash_remain_times > 0:
@@ -39,6 +39,14 @@ func _on_dash_timer_timeout():
 		dash_remain_times = DASH_TIMES
 		get_node("DashTimer").stop()
 		gravity = ProjectSettings.get_setting("physics/2d/default_gravity")
+		player_direction = 0
+		
+func _on_dash_cool_down_timer_timeout():
+	if dash_cool_down_percentage < DASH_COOL_DOWN_PERCENTAGE:
+		dash_cool_down_percentage += 1
+	else:
+		get_node("DashCoolDownTimer").stop()
+		is_dash_in_cool_down = false
 		
 ############################################################ Wall Jump ############################################################
 
@@ -49,7 +57,7 @@ func _on_wall_jump_timer_timeout():
 	is_wall_jump = false
 	wall_jump_direction = 0
 	get_node("WallJumpTimer").stop()
-
+	
 ############################################################ Anime State Machine ############################################################
 
 enum Anime_State {
@@ -114,6 +122,9 @@ func State_Machine(state, convert):
 
 ############################################################ Process ############################################################
 
+func _ready():
+	pass
+
 func _physics_process(delta):
 ## Grvaity
 	if not is_on_floor(): velocity.y += gravity * delta
@@ -138,10 +149,18 @@ func _physics_process(delta):
 		anime_state_convert = Anime_State_Convert.Jump
 ## Dash
 	if Input.is_action_pressed("Move_Dash"):
-		get_node("DashTimer").start()
-		gravity = 0
-		velocity.y = 0
-		speed_multiple = DASH_SPEED_MULTIPLE
+		if not is_dash_in_cool_down:
+			get_node("DashTimer").start()
+			get_node("DashCoolDownTimer").start()
+			is_dash_in_cool_down = true
+			dash_cool_down_percentage = 0
+			gravity = 0
+			velocity.y = 0
+			if get_node("AnimatedSprite2D").flip_h:
+				player_direction = -1
+			else :
+				player_direction = 1
+			speed_multiple = DASH_SPEED_MULTIPLE
 ## v.x
 	if not is_wall_jump:
 		velocity.x = player_direction * SPEED * speed_multiple
@@ -165,12 +184,16 @@ func _physics_process(delta):
 	elif anime_state == Anime_State.Wall_Jump:
 		anime.play("Jump")
 	
+## Update Global
+	Global.Dash_Cool_Down_Percentage = dash_cool_down_percentage
+	
+## Other
+
 	move_and_slide()
 	Player_Death_or_Out_Game()
 
 func Player_Death_or_Out_Game():
-	if (Global.Health <= 0) or (Global.enemy_nums < 0):
-		#queue_free()
+	if Input.is_action_pressed("ESC"):
 		Utils.SaveGame()
 		var world = get_parent().get_parent()
 		world.Out_World()

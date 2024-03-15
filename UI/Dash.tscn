@@ -1,0 +1,10 @@
+[gd_scene load_steps=2 format=3 uid="uid://hylcvh78lmh4"]
+
+[ext_resource type="Script" path="res://UI/Dash.gd" id="1_a5k0v"]
+
+[node name="Dash" type="ProgressBar"]
+modulate = Color(1, 0.866667, 0.192157, 1)
+offset_right = 239.0
+offset_bottom = 27.0
+show_percentage = false
+script = ExtResource("1_a5k0v")

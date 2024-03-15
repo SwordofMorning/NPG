@@ -349,5 +349,9 @@ wait_time = 0.01
 [node name="WallJumpTimer" type="Timer" parent="."]
 wait_time = 0.3
 
+[node name="DashCoolDownTimer" type="Timer" parent="."]
+wait_time = 0.01
+
 [connection signal="timeout" from="DashTimer" to="." method="_on_dash_timer_timeout"]
 [connection signal="timeout" from="WallJumpTimer" to="." method="_on_wall_jump_timer_timeout"]
+[connection signal="timeout" from="DashCoolDownTimer" to="." method="_on_dash_cool_down_timer_timeout"]
