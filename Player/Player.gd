@@ -1,7 +1,8 @@
 extends CharacterBody2D
 
 const SPEED = 200.0
-const JUMP_VELOCITY = -400.0
+const JUMP_VELOCITY = -350.0
+const WALL_JUMP_VELOCITY = -260
 
 # -1 is left, 1 is right
 var player_direction = 0
@@ -38,18 +39,22 @@ func _on_dash_timer_timeout():
 		dash_remain_times = DASH_TIMES
 		get_node("DashTimer").stop()
 		gravity = ProjectSettings.get_setting("physics/2d/default_gravity")
+		
+############################################################ Wall Jump ############################################################
 
-func Player_Death_or_Out_Game():
-	if (Global.Health <= 0) or (Global.enemy_nums < 0):
-		#queue_free()
-		Utils.SaveGame()
-		var world = get_parent().get_parent()
-		world.Out_World()
+var is_wall_jump = false
+var wall_jump_direction = 0
+
+func _on_wall_jump_timer_timeout():
+	is_wall_jump = false
+	wall_jump_direction = 0
+	get_node("WallJumpTimer").stop()
 
 ############################################################ Anime State Machine ############################################################
 
 enum Anime_State {
 	Jump,
+	Wall_Jump,
 	Run,
 	Idle,
 	Wall_Slide,
@@ -93,12 +98,18 @@ func State_Machine(state, convert):
 		if is_on_floor():
 			return Anime_State.Idle
 		elif convert == Anime_State_Convert.Jump:
-			return Anime_State.Jump
+			is_wall_jump = true
+			wall_jump_direction = get_wall_normal().x
+			get_node("WallJumpTimer").start()
+			return Anime_State.Wall_Jump
 		elif is_on_wall():
 			if (velocity.x > 0 and get_wall_normal().x < 0) or (velocity.x < 0 and get_wall_normal().x > 0):
 				return Anime_State.Wall_Slide
 			else:
 				return Anime_State.Fall
+	elif state == Anime_State.Wall_Jump:
+		if velocity.y > 0:
+			return Anime_State.Fall
 	return state
 
 ############################################################ Process ############################################################
@@ -119,9 +130,11 @@ func _physics_process(delta):
 		player_direction = 0
 		anime_state_convert = Anime_State_Convert.Run_Released
 ## Jump
-	if Input.is_action_pressed("Move_Jump") and (is_on_floor() or anime_state == Anime_State.Wall_Slide):
-		velocity.y = JUMP_VELOCITY
-		#anime_state = Anime_State.Jump
+	if Input.is_action_pressed("Move_Jump") and (is_on_floor() or anime_state == Anime_State.Wall_Slide):		
+		if anime_state == Anime_State.Wall_Slide:
+			velocity.y = WALL_JUMP_VELOCITY
+		else:
+			velocity.y = JUMP_VELOCITY
 		anime_state_convert = Anime_State_Convert.Jump
 ## Dash
 	if Input.is_action_pressed("Move_Dash"):
@@ -129,7 +142,11 @@ func _physics_process(delta):
 		gravity = 0
 		velocity.y = 0
 		speed_multiple = DASH_SPEED_MULTIPLE
-	velocity.x = player_direction * SPEED * speed_multiple
+## v.x
+	if not is_wall_jump:
+		velocity.x = player_direction * SPEED * speed_multiple
+	elif is_wall_jump:
+		velocity.x = wall_jump_direction * SPEED
 
 	anime_state = State_Machine(anime_state, anime_state_convert)
 
@@ -145,6 +162,15 @@ func _physics_process(delta):
 		velocity.y /= 2
 	elif anime_state == Anime_State.Fall:
 		anime.play("Fall")
+	elif anime_state == Anime_State.Wall_Jump:
+		anime.play("Jump")
 	
 	move_and_slide()
 	Player_Death_or_Out_Game()
+
+func Player_Death_or_Out_Game():
+	if (Global.Health <= 0) or (Global.enemy_nums < 0):
+		#queue_free()
+		Utils.SaveGame()
+		var world = get_parent().get_parent()
+		world.Out_World()
