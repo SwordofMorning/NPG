@@ -4,6 +4,9 @@ uniform sampler2D SCREEN_TEXTURE : hint_screen_texture, filter_nearest;
 uniform vec2 center;
 uniform float force;
 uniform float size;
+uniform float ringColor_R;
+uniform float ringColor_G;
+uniform float ringColor_B;
 
 void vertex() {
 	// Called for every vertex the material is visible on.
@@ -26,6 +29,7 @@ void fragment() {
 	// Generate a vector opposite to the center point for each pixel
 	vec2 radiation_vec = normalize(scaledUV - center) * force * mask;
 	COLOR = texture(SCREEN_TEXTURE, SCREEN_UV - radiation_vec);
+	COLOR.rgb += 0.5 * vec3(mask) * vec3(ringColor_R, ringColor_G, ringColor_B);
 	// To vertify mask is a circle
 	//COLOR.rgb = vec3(mask);
 }
