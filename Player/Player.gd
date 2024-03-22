@@ -161,6 +161,7 @@ func _physics_process(delta):
 			else :
 				player_direction = 1
 			speed_multiple = DASH_SPEED_MULTIPLE
+			get_node("../../UI/AnimationPlayer").play("Shockwave")
 ## v.x
 	if not is_wall_jump:
 		velocity.x = player_direction * SPEED * speed_multiple

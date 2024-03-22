@@ -1,4 +1,4 @@
-[gd_scene load_steps=15 format=3 uid="uid://dx4nl8k78hn2r"]
+[gd_scene load_steps=20 format=3 uid="uid://dx4nl8k78hn2r"]
 
 [ext_resource type="Script" path="res://World.gd" id="1_d7mft"]
 [ext_resource type="PackedScene" uid="uid://gr1nobse84bf" path="res://Player/Player.tscn" id="1_l40fi"]
@@ -8,6 +8,7 @@
 [ext_resource type="Texture2D" uid="uid://kwmqcahdotm6" path="res://Resource/sunny-land/assets/environment/tileset.png" id="5_phtio"]
 [ext_resource type="PackedScene" uid="uid://g7urgjl4xmuv" path="res://Enemy/Frog.tscn" id="6_od2rk"]
 [ext_resource type="PackedScene" uid="uid://hylcvh78lmh4" path="res://UI/Dash.tscn" id="9_1iohm"]
+[ext_resource type="Shader" path="res://Player/Shockwave.gdshader" id="9_cp2yy"]
 [ext_resource type="PackedScene" uid="uid://bgshc1ae5xyap" path="res://Enemy/cherry.tscn" id="9_whovn"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_ktieo"]
@@ -1400,6 +1401,73 @@ sources/0 = SubResource("TileSetAtlasSource_yoavt")
 sources/1 = SubResource("TileSetAtlasSource_1vwq3")
 sources/2 = SubResource("TileSetAtlasSource_jkwt6")
 
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_226xo"]
+shader = ExtResource("9_cp2yy")
+shader_parameter/center = Vector2(0.5, 0.5)
+shader_parameter/force = 0.0
+shader_parameter/size = 0.0
+
+[sub_resource type="Animation" id="Animation_3cund"]
+resource_name = "Shockwave"
+length = 0.8
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("ColorRect_Shockwave:material:shader_parameter/size")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8),
+"transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1, 1, 1, 1),
+"update": 0,
+"values": [0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("ColorRect_Shockwave:material:shader_parameter/force")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8),
+"transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1, 1, 1, 1),
+"update": 0,
+"values": [0.2, 0.18, 0.15, 0.12, 0.1, 0.05, 0.03, 0.02, 0.0]
+}
+
+[sub_resource type="Animation" id="Animation_ks51c"]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("ColorRect_Shockwave:material:shader_parameter/size")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [0.0]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("ColorRect_Shockwave:material:shader_parameter/force")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [0.0]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_tp81w"]
+_data = {
+"RESET": SubResource("Animation_ks51c"),
+"Shockwave": SubResource("Animation_3cund")
+}
+
 [node name="World" type="Node2D"]
 script = ExtResource("1_d7mft")
 
@@ -1461,6 +1529,20 @@ offset_left = 237.0
 offset_top = 21.0
 offset_right = 476.0
 offset_bottom = 48.0
+
+[node name="ColorRect_Shockwave" type="ColorRect" parent="UI"]
+self_modulate = Color(1, 1, 1, 0)
+material = SubResource("ShaderMaterial_226xo")
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="UI"]
+libraries = {
+"": SubResource("AnimationLibrary_tp81w")
+}
 
 [node name="Collection" type="Node2D" parent="."]
 
